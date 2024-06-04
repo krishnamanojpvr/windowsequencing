@@ -1,0 +1,13 @@
+/* .options{
+    row-gap: 1px;;
+} */
+.main{
+    border: 2px sandybrown;
+    border-radius: 30px;
+    background-color:rgb(48, 218, 231);
+}
+.answerbox{
+    border:2px white;
+    border-radius: 30px;
+    background-color: rgb(234, 220, 200);
+}
