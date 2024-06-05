@@ -201,7 +201,7 @@ const QuestionPage = () => {
 
   return (
     <DndProvider backend={isMobile ? TouchBackend : HTML5Backend}>
-      <div className="head mt-2">
+      <div className="header mt-2">
         <h1>Window Sequencing</h1>
         <button
           tabIndex="0"
