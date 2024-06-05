@@ -140,7 +140,7 @@ const DroppableBox = ({ answerImages, setAnswerImages, maxItems }) => {
             key={index}
             src={src}
             index={index}
-            moveImage={moveImage}
+            moveImage={moveImage} 
           />
         ))}
       </div>
@@ -175,8 +175,8 @@ const QuestionPage = () => {
     const isCorrect =
       JSON.stringify(answerImages) === JSON.stringify(questionData.question);
     setTries(tries + 1);
-    console.log(tries);
     if (isCorrect) {
+      
       setShowConfetti(true);
       setTimeout(() => {
         setShowConfetti(false);
@@ -230,7 +230,7 @@ const QuestionPage = () => {
             setAnswerImages={setAnswerImages}
             maxItems={questionData.question.length}
           />
-          <button onClick={handleSubmit} className="btn btn-primary ms-2 rounded-5 h-25 ">
+          <button onClick={handleSubmit} id="submitbutton" className="btn btn-custom ms-2 rounded-5 h-25 ">
             Submit
           </button>
         </div>

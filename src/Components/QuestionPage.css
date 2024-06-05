@@ -2,12 +2,26 @@
     row-gap: 1px;;
 } */
 .main{
-    border: 2px sandybrown;
+    border:3px solid;
+    border-color:  rgb(19, 108, 143);
     border-radius: 30px;
     background-color:rgb(48, 218, 231);
 }
 .answerbox{
-    border:2px white;
+    border:3px solid;
+    border-color: rgb(121, 85, 34);
     border-radius: 30px;
     background-color: rgb(234, 220, 200);
+}
+
+#submitbutton{
+    border: 2px white;
+    border-radius: 30px;
+    background-color: green;
+    color: white;
+    
+}
+#submitbutton:hover{
+    background-color:rgb(234, 220, 200);
+    color: black;
 }
