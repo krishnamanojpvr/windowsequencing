@@ -24,7 +24,7 @@ const DraggableImage = ({ src, index }) => {
     <img
       ref={drag}
       src={src}
-      className={`img-thumbnail ${isDragging ? "opacity-50" : ""}`}
+      className={`img-thumbnail ${isDragging ? "opacity-50" : ""} dragImg`}
       width="100"
       height="100"
       alt={`option-${index}`}
@@ -61,7 +61,7 @@ const DraggableAnswerImage = ({ src, index, moveImage }) => {
     <img
       ref={ref}
       src={src}
-      className={`img-thumbnail m-1 ${isDragging ? "opacity-50" : ""}`}
+      className={`img-thumbnail m-1 ${isDragging ? "opacity-50" : ""} answerImg`}
       width="100"
       height="100"
       alt={`answer-${index}`}
@@ -89,7 +89,7 @@ const getHoverIndex = (monitor, ref, answerImages) => {
   return newIndex;
 };
 
-const DroppableBox = ({ answerImages, setAnswerImages, maxItems }) => {
+const DroppableBox = ({ answerImages, setAnswerImages, maxItems , borderClass}) => {
   const ref = useRef(null);
 
   const [, drop] = useDrop({
@@ -128,8 +128,8 @@ const DroppableBox = ({ answerImages, setAnswerImages, maxItems }) => {
   return (
     <div
       ref={drop}
-      className="border answerbox p-3 d-flex flex-row flex-wrap align-items-center justify-content-center"
-      style={{ minHeight: "180px", width: "70%" }}
+      className={`answerbox p-3 d-flex flex-row flex-wrap align-items-center justify-content-center ${borderClass}`}
+      style={{ minHeight: "180px", width: "100%"}}
     >
       <div
         ref={ref}
@@ -140,7 +140,7 @@ const DroppableBox = ({ answerImages, setAnswerImages, maxItems }) => {
             key={index}
             src={src}
             index={index}
-            moveImage={moveImage} 
+            moveImage={moveImage}
           />
         ))}
       </div>
@@ -152,13 +152,15 @@ const QuestionPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [answerImages, setAnswerImages] = useState([]);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [tries, setTries] = useState(1);
+  const [tries, setTries] = useState(0);
   const gameInstructions = "";
   const questionData = data[currentPage];
+  const [borderClass, setBorderClass] = useState("");
   useEffect(() => {
     const popoverTriggerList = document.querySelectorAll(
       '[data-bs-toggle="popover"]'
     );
+    // eslint-disable-next-line 
     const popoverList = [...popoverTriggerList].map(
       (popoverTriggerEl) => new Popover(popoverTriggerEl)
     );
@@ -174,29 +176,33 @@ const QuestionPage = () => {
   const handleSubmit = () => {
     const isCorrect =
       JSON.stringify(answerImages) === JSON.stringify(questionData.question);
-    setTries(tries + 1);
-    if (isCorrect) {
-      
-      setShowConfetti(true);
-      setTimeout(() => {
-        setShowConfetti(false);
-      }, 3000);
+      setTries(tries + 1);
+      if (isCorrect) {
+        setShowConfetti(true);
+        setBorderClass("blink-green")
+        setTimeout(() => {
+          setShowConfetti(false);
+          setBorderClass("");
+        }, 3000);
       const nextPage = currentPage + 1;
       if (data[nextPage]) {
         setCurrentPage(nextPage);
         setAnswerImages([]);
-      } else {
-        alert("You have completed all questions!");
-      }
-    } else {
-      alert("Wrong. Try again.");
+      } 
+    } 
+    else {
+      setBorderClass('blink-red');
+      setTimeout(()=>{
+        setBorderClass("");
+      },2000)
       setAnswerImages([]);
     }
   };
 
   return (
     <DndProvider backend={isMobile ? TouchBackend : HTML5Backend}>
-      <div className="container main mt-4">
+      <div className="head mt-2">
+        <h1>Window Sequencing</h1>
         <button
           tabIndex="0"
           className="btn btn-lg btn-warning mt-2 mb-2"
@@ -207,6 +213,9 @@ const QuestionPage = () => {
         >
           Game Instructions
         </button>
+      </div>
+      <p>Tries : {tries}</p>
+      <div className="container main mt-4">
         <div className="mb-4">
           <h3>Question:</h3>
           <div className="d-flex flex-row flex-wrap justify-content-center mb-3">
@@ -214,7 +223,7 @@ const QuestionPage = () => {
               <img
                 key={index}
                 src={src}
-                className="img-thumbnail m-1"
+                className="img-thumbnail m-1 dragImg"
                 width="100"
                 height="100"
                 alt={`question-${index}`}
@@ -229,18 +238,22 @@ const QuestionPage = () => {
             answerImages={answerImages}
             setAnswerImages={setAnswerImages}
             maxItems={questionData.question.length}
+            borderClass = {borderClass}
           />
-          <button onClick={handleSubmit} id="submitbutton" className="btn btn-custom ms-2 rounded-5 h-25 ">
-            Submit
-          </button>
         </div>
-        
 
         <div>
+          <button
+            onClick={handleSubmit}
+            id="submitbutton"
+            className="submitbutton ms-2 mb-4"
+          >
+            Submit
+          </button>
           <h3>Options:</h3>
           <div className="d-flex flex-row flex-wrap justify-content-center">
             {questionData.images.map((src, index) => (
-              <DraggableImage key={index} src={src} index={index} />
+              <DraggableImage key={index} src={src}  index={index} />
             ))}
           </div>
         </div>
