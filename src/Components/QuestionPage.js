@@ -7,6 +7,9 @@ import Confetti from "react-confetti";
 import update from "immutability-helper";
 import data from "./data.json";
 import { Popover } from "bootstrap";
+import CorrectAudio from '../Audio/Correct.mp3'
+import OopsTryAgainAudio from '../Audio/OopsTryAgain.mp3'
+import PleaseAddTheImagesAudio from '../Audio/PleaseAddTheImages.mp3'
 
 const ItemType = "IMAGE";
 const AnswerType = "ANSWER_IMAGE";
@@ -61,7 +64,9 @@ const DraggableAnswerImage = ({ src, index, moveImage }) => {
     <img
       ref={ref}
       src={src}
-      className={`img-thumbnail m-1 ${isDragging ? "opacity-50" : ""} answerImg`}
+      className={`img-thumbnail m-1 ${
+        isDragging ? "opacity-50" : ""
+      } answerImg`}
       width="100"
       height="100"
       alt={`answer-${index}`}
@@ -89,7 +94,12 @@ const getHoverIndex = (monitor, ref, answerImages) => {
   return newIndex;
 };
 
-const DroppableBox = ({ answerImages, setAnswerImages, maxItems , borderClass}) => {
+const DroppableBox = ({
+  answerImages,
+  setAnswerImages,
+  maxItems,
+  borderClass,
+}) => {
   const ref = useRef(null);
 
   const [, drop] = useDrop({
@@ -129,7 +139,7 @@ const DroppableBox = ({ answerImages, setAnswerImages, maxItems , borderClass}) 
     <div
       ref={drop}
       className={`answerbox p-3 d-flex flex-row flex-wrap align-items-center justify-content-center ${borderClass}`}
-      style={{ minHeight: "180px", width: "100%"}}
+      style={{ minHeight: "180px", width: "100%" }}
     >
       <div
         ref={ref}
@@ -153,48 +163,64 @@ const QuestionPage = () => {
   const [answerImages, setAnswerImages] = useState([]);
   const [showConfetti, setShowConfetti] = useState(false);
   const [tries, setTries] = useState(0);
-  const gameInstructions = "";
-  const questionData = data[currentPage];
   const [borderClass, setBorderClass] = useState("");
+  const [warning, setWarning] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  
+  const questionData = data[currentPage];
+  const gameInstructions = "";
   useEffect(() => {
     const popoverTriggerList = document.querySelectorAll(
       '[data-bs-toggle="popover"]'
     );
-    // eslint-disable-next-line 
+    // eslint-disable-next-line
     const popoverList = [...popoverTriggerList].map(
       (popoverTriggerEl) => new Popover(popoverTriggerEl)
     );
   }, []);
-
-  // console.log('Current Page:', currentPage);
-  // console.log('Question Data:', questionData);
 
   if (!questionData) {
     return <div>Loading...</div>;
   }
 
   const handleSubmit = () => {
+    setSubmitted(true);
     const isCorrect =
       JSON.stringify(answerImages) === JSON.stringify(questionData.question);
-      setTries(tries + 1);
       if (isCorrect) {
-        setShowConfetti(true);
-        setBorderClass("blink-green")
-        setTimeout(() => {
-          setShowConfetti(false);
-          setBorderClass("");
-        }, 3000);
-      const nextPage = currentPage + 1;
-      if (data[nextPage]) {
-        setCurrentPage(nextPage);
-        setAnswerImages([]);
-      } 
-    } 
-    else {
-      setBorderClass('blink-red');
-      setTimeout(()=>{
+      setTries(tries + 1);
+      setWarning("Yayy. .Correct!");
+      const CorrectAud = new Audio(CorrectAudio);
+      CorrectAud.play();
+      setShowConfetti(true);
+      setBorderClass("blink-green");
+      setTimeout(() => {
+        setShowConfetti(false);
         setBorderClass("");
-      },2000)
+        setSubmitted(false);
+        const nextPage = currentPage + 1;
+        if (data[nextPage]) {
+          setCurrentPage(nextPage);
+          setAnswerImages([]);
+        }
+      }, 4000);
+    } else {
+      setBorderClass("blink-red");
+      //! console.log(JSON.stringify(answerImages).length)
+      if (JSON.stringify(answerImages).length < 3) {
+        const PleaseAddTheImagesAud = new Audio(PleaseAddTheImagesAudio);
+        PleaseAddTheImagesAud.play();
+        setWarning(`Please add the images. .`);
+      } else if (!isCorrect) {
+        setTries(tries+1)
+        const OopsTryAgainAud = new Audio(OopsTryAgainAudio);
+        OopsTryAgainAud.play();
+        setWarning("Oops! Try Again :)");
+      }
+      setTimeout(() => {
+        setBorderClass("");
+        setSubmitted(false);
+      }, 2500);
       setAnswerImages([]);
     }
   };
@@ -238,22 +264,26 @@ const QuestionPage = () => {
             answerImages={answerImages}
             setAnswerImages={setAnswerImages}
             maxItems={questionData.question.length}
-            borderClass = {borderClass}
+            borderClass={borderClass}
           />
         </div>
 
         <div>
-          <button
-            onClick={handleSubmit}
-            id="submitbutton"
-            className="submitbutton ms-2 mb-4"
-          >
-            Submit
-          </button>
+          {!submitted && (
+            <button
+              onClick={handleSubmit}
+              className="submitbutton ms-2 mb-4"
+            >
+              Submit
+            </button>
+          )}
+
+          {submitted && <p className={`warning ${warning.includes('Correct') ? 'btn btn-success' : 'btn btn-danger'}`}>{warning}</p>}
+
           <h3>Options:</h3>
           <div className="d-flex flex-row flex-wrap justify-content-center">
             {questionData.images.map((src, index) => (
-              <DraggableImage key={index} src={src}  index={index} />
+              <DraggableImage key={index} src={src} index={index} />
             ))}
           </div>
         </div>

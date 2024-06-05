@@ -4,15 +4,15 @@
         "images":["../a1.png","../a2.png","../a3.png","../a4.png","../boat.png","../boatshadow.png","../jar.png"]
     },
     "2":{
-        "question":["../boat.png","../a2.png","../a3.png"],
+        "question":["../boat.png","../a4.png","../jar.png"],
         "images":["../a1.png","../a2.png","../a3.png","../a4.png","../boat.png","../boatshadow.png","../jar.png"]
     },
     "3":{
-        "question":["../jar.png","../a2.png","../a3.png"],
+        "question":["../jar.png","../a2.png","../a4.png"],
         "images":["../a1.png","../a2.png","../a3.png","../a4.png","../boat.png","../boatshadow.png","../jar.png"]
     },
     "4":{
-        "question":["../boatshadow.png","../a2.png","../a3.png"],
+        "question":["../boat.png","../a1.png","../a3.png"],
         "images":["../a1.png","../a2.png","../a3.png","../a4.png","../boat.png","../boatshadow.png","../jar.png"]
     }
 }

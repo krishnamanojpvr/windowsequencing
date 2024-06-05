@@ -25,11 +25,11 @@
   }
   
   .blink-red {
-    animation: blink-red 0.5s 2;
+    animation: blink-red 0.5s 5;
   }
   
   .blink-green {
-    animation: blink-green 0.5s 2;
+    animation: blink-green 0.5s 5;
   }
 
 .answerImg{
