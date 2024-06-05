@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useDrag, useDrop, DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { TouchBackend } from 'react-dnd-touch-backend';
 import { isMobile } from 'react-device-detect';
 import Confetti from 'react-confetti';
+import update from 'immutability-helper';
 import data from './data.json';
 
 const ItemType = 'IMAGE';
@@ -30,11 +31,47 @@ const DraggableImage = ({ src, index }) => {
   );
 };
 
-const DroppableBox = ({ answerImages, setAnswerImages }) => {
+const getHoverIndex = (monitor, ref, answerImages) => {
+  const hoverBoundingRect = ref.current.getBoundingClientRect();
+  const hoverClientX = monitor.getClientOffset().x - hoverBoundingRect.left;
+  
+  let newIndex = 0;
+  let sumWidth = 0;
+  
+  for (let i = 0; i < answerImages.length; i++) {
+    const imgWidth = 100; // width of the image (you may adjust if needed)
+    sumWidth += imgWidth + 10; // width + margin
+    if (hoverClientX < sumWidth) {
+      newIndex = i;
+      break;
+    } else {
+      newIndex = i + 1;
+    }
+  }
+  return newIndex;
+};
+
+const DroppableBox = ({ answerImages, setAnswerImages, maxItems }) => {
+  const ref = useRef(null);
+
   const [, drop] = useDrop({
     accept: ItemType,
+    hover: (item, monitor) => {
+      if (!ref.current) {
+        return;
+      }
+      const hoverIndex = getHoverIndex(monitor, ref, answerImages);
+      item.hoverIndex = hoverIndex;
+    },
     drop: (item) => {
-      setAnswerImages((prevImages) => [...prevImages, item.src]);
+      if (answerImages.length >= maxItems) {
+        return;
+      }
+      const hoverIndex = item.hoverIndex !== undefined ? item.hoverIndex : answerImages.length;
+      const newAnswerImages = update(answerImages, {
+        $splice: [[hoverIndex, 0, item.src]],
+      });
+      setAnswerImages(newAnswerImages);
     },
   });
 
@@ -42,11 +79,20 @@ const DroppableBox = ({ answerImages, setAnswerImages }) => {
     <div
       ref={drop}
       className="border answerbox p-3 d-flex flex-row flex-wrap align-items-center justify-content-center"
-      style={{ minHeight: '180px', width: '50%'}}
+      style={{ minHeight: '180px', width: '70%' }}
     >
-      {answerImages.map((src, index) => (
-        <img key={index} src={src} className="img-thumbnail m-1" width="100" height="100" alt={`answer-${index}`} />
-      ))}
+      <div ref={ref} className="d-flex flex-row flex-wrap align-items-center justify-content-center">
+        {answerImages.map((src, index) => (
+          <img
+            key={index}
+            src={src}
+            className="img-thumbnail m-1"
+            width="100"
+            height="100"
+            alt={`answer-${index}`}
+          />
+        ))}
+      </div>
     </div>
   );
 };
@@ -67,7 +113,6 @@ const QuestionPage = () => {
   const handleSubmit = () => {
     const isCorrect = JSON.stringify(answerImages) === JSON.stringify(questionData.question);
     if (isCorrect) {
-      // alert('Correct!');
       setShowConfetti(true);
       setTimeout(() => {
         setShowConfetti(false);
@@ -87,11 +132,7 @@ const QuestionPage = () => {
 
   return (
     <DndProvider backend={isMobile ? TouchBackend : HTML5Backend}>
-      {/* <div>
-        <h1 className="text-center">Drag and Drop Quiz</h1>
-      </div> */}
       <div className="container main mt-4">
-        {/* Question Section */}
         <div className="mb-4">
           <h3>Question:</h3>
           <div className="d-flex flex-row flex-wrap justify-content-center mb-3">
@@ -101,14 +142,11 @@ const QuestionPage = () => {
           </div>
         </div>
 
-        {/* Answer Box */}
         <h3>Answer Box:</h3>
         <div className="mb-4 d-flex justify-content-center">
-          
-          <DroppableBox answerImages={answerImages} setAnswerImages={setAnswerImages} />
+          <DroppableBox answerImages={answerImages} setAnswerImages={setAnswerImages} maxItems={questionData.question.length} />
         </div>
 
-        {/* Options Section */}
         <div>
           <h3>Options:</h3>
           <div className="d-flex flex-row flex-wrap justify-content-center">
@@ -118,16 +156,14 @@ const QuestionPage = () => {
           </div>
         </div>
 
-        {/* Submit Button */}
         <div className="mt-3 d-flex justify-content-center">
           <button onClick={handleSubmit} className="btn btn-primary">
             Submit
           </button>
         </div>
-          
-          {/* Confetti */}
-          {showConfetti && <Confetti />}
-        <br></br>
+
+        {showConfetti && <Confetti />}
+        <br />
       </div>
     </DndProvider>
   );
