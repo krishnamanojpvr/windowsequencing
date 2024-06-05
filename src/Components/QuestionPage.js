@@ -7,9 +7,11 @@ import Confetti from "react-confetti";
 import update from "immutability-helper";
 import data from "./data.json";
 import { Popover } from "bootstrap";
-import CorrectAudio from '../Audio/Correct.mp3'
-import OopsTryAgainAudio from '../Audio/OopsTryAgain.mp3'
-import PleaseAddTheImagesAudio from '../Audio/PleaseAddTheImages.mp3'
+import CorrectAudio from "../Audio/Correct.mp3";
+import OopsTryAgainAudio from "../Audio/OopsTryAgain.mp3";
+import PleaseAddTheImagesAudio from "../Audio/PleaseAddTheImages.mp3";
+import HowToPlayAudio from "../Audio/HowToPlay.mp3";
+import MatchThePatternAudio from "../Audio/MatchThePattern.mp3";
 
 const ItemType = "IMAGE";
 const AnswerType = "ANSWER_IMAGE";
@@ -166,9 +168,15 @@ const QuestionPage = () => {
   const [borderClass, setBorderClass] = useState("");
   const [warning, setWarning] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  
+
+  const handleAudioClick = (audioFile) => {
+    const audio = new Audio(audioFile);
+    audio.play();
+  };
+
   const questionData = data[currentPage];
-  const gameInstructions = "";
+  const gameInstructions =
+    "Drag and Drop the images from the options into the answer box in the same order as given in the question (You can also reorder the images in the answer box)";
   useEffect(() => {
     const popoverTriggerList = document.querySelectorAll(
       '[data-bs-toggle="popover"]'
@@ -187,7 +195,7 @@ const QuestionPage = () => {
     setSubmitted(true);
     const isCorrect =
       JSON.stringify(answerImages) === JSON.stringify(questionData.question);
-      if (isCorrect) {
+    if (isCorrect) {
       setTries(tries + 1);
       setWarning("Yayy. .Correct!");
       const CorrectAud = new Audio(CorrectAudio);
@@ -212,7 +220,7 @@ const QuestionPage = () => {
         PleaseAddTheImagesAud.play();
         setWarning(`Please add the images. .`);
       } else if (!isCorrect) {
-        setTries(tries+1)
+        setTries(tries + 1);
         const OopsTryAgainAud = new Audio(OopsTryAgainAudio);
         OopsTryAgainAud.play();
         setWarning("Oops! Try Again :)");
@@ -223,22 +231,42 @@ const QuestionPage = () => {
       }, 2500);
       setAnswerImages([]);
     }
+    
   };
 
   return (
     <DndProvider backend={isMobile ? TouchBackend : HTML5Backend}>
       <div className="header mt-2">
-        <h1>Window Sequencing</h1>
-        <button
-          tabIndex="0"
-          className="btn btn-lg btn-warning mt-2 mb-2"
-          data-bs-toggle="popover"
-          data-bs-trigger="focus"
-          data-bs-title="How to Play?"
-          data-bs-content={gameInstructions}
-        >
-          Game Instructions
-        </button>
+        <h1>Match The Pattern
+        <img
+              src={'../play.svg'}
+              alt="Play audio"
+              width="24"
+              height="24"
+              style={{ cursor: "pointer", marginLeft: "10px" }}
+              onClick={() => handleAudioClick(MatchThePatternAudio)}
+            />
+        </h1>
+        <div>
+           <button
+            tabIndex="0"
+            className="btn btn-lg btn-warning mt-2 mb-2"
+            data-bs-toggle="popover"
+            data-bs-trigger="focus"
+            data-bs-title="How to Play?"
+            data-bs-content={gameInstructions}
+          >
+            Game Instructions
+            <img
+              src={'../play.svg'}
+              alt="Play audio"
+              width="24"
+              height="24"
+              style={{ cursor: "pointer", marginLeft: "10px" }}
+              onClick={() => handleAudioClick(HowToPlayAudio)}
+            />
+          </button>
+        </div>
       </div>
       <p>Tries : {tries}</p>
       <div className="container main mt-4">
@@ -270,15 +298,22 @@ const QuestionPage = () => {
 
         <div>
           {!submitted && (
-            <button
-              onClick={handleSubmit}
-              className="submitbutton ms-2 mb-4"
-            >
+            <button onClick={handleSubmit} className="submitbutton ms-2 mb-4">
               Submit
             </button>
           )}
 
-          {submitted && <p className={`warning ${warning.includes('Correct') ? 'btn btn-success' : 'btn btn-danger'}`}>{warning}</p>}
+          {submitted && (
+            <p
+              className={`warning ${
+                warning.includes("Correct")
+                  ? "btn btn-success"
+                  : "btn btn-danger"
+              }`}
+            >
+              {warning}
+            </p>
+          )}
 
           <h3>Options:</h3>
           <div className="d-flex flex-row flex-wrap justify-content-center">
