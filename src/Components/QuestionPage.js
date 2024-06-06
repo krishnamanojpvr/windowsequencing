@@ -29,7 +29,7 @@ const DraggableImage = ({ src, index }) => {
     <img
       ref={drag}
       src={src}
-      className={`img-thumbnail ${isDragging ? "opacity-50" : ""} dragImg`}
+      className={`img-thumbnail  dragImg`}
       width="100"
       height="100"
       alt={`option-${index}`}
@@ -197,7 +197,7 @@ const QuestionPage = () => {
       JSON.stringify(answerImages) === JSON.stringify(questionData.question);
     if (isCorrect) {
       setTries(tries + 1);
-      setWarning("Yayy. .Correct!");
+      setWarning("Correctt!!");
       const CorrectAud = new Audio(CorrectAudio);
       CorrectAud.play();
       setShowConfetti(true);
@@ -277,6 +277,7 @@ const QuestionPage = () => {
               <img
                 key={index}
                 src={src}
+                draggable={false}
                 className="img-thumbnail m-1 dragImg"
                 width="100"
                 height="100"

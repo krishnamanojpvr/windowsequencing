@@ -25,7 +25,7 @@
   }
   
   .blink-red {
-    animation: blink-red 0.5s 5;
+    animation: blink-red 0.5s 1;
   }
   
   .blink-green {
@@ -45,7 +45,7 @@
     border-color:  rgb(48, 218, 231);
     box-shadow: 5px 3px 10px 0px;
     border-radius: 20px;
-    /* background : transparent; */
+    background : transparent;
     background-color: rgb(48, 218, 231);
 }
 
