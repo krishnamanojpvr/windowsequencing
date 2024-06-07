@@ -11,6 +11,9 @@
     background-color: rgb(234, 220, 200);
     /* background-color: rgb(234, 220, 200); */
 }
+h1{
+  font-family:'OpenDyslexicBold';
+}
 
 @keyframes blink-red {
     0% { border-color: red; }

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useDrag, useDrop, DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { TouchBackend } from "react-dnd-touch-backend";
-import { isMobile } from "react-device-detect";
+import { isMobile, isTablet } from "react-device-detect";
 import Confetti from "react-confetti";
 import update from "immutability-helper";
 import data from "./data.json";
@@ -168,6 +168,10 @@ const QuestionPage = () => {
   const [borderClass, setBorderClass] = useState("");
   const [warning, setWarning] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [gameOver, setGameOver] = useState(false);
+  const [gameStarted, setGameStarted] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const timerRef = useRef(null);
 
   const handleAudioClick = (audioFile) => {
     const audio = new Audio(audioFile);
@@ -191,34 +195,48 @@ const QuestionPage = () => {
     return <div>Loading...</div>;
   }
 
+  const handleStartGame = () => {
+    setGameStarted(true);
+    const startTime = Date.now();
+    timerRef.current = setInterval(() => {
+      setElapsedTime(Date.now() - startTime);
+    }, 1000);
+  };
+
   const handleSubmit = () => {
     setSubmitted(true);
     const isCorrect =
       JSON.stringify(answerImages) === JSON.stringify(questionData.question);
     if (isCorrect) {
       setTries(tries + 1);
-      setWarning("Correctt!!");
+      setShowConfetti(true);
+      setWarning("Correct!!");
       const CorrectAud = new Audio(CorrectAudio);
       CorrectAud.play();
-      setShowConfetti(true);
       setBorderClass("blink-green");
-      setTimeout(() => {
-        setShowConfetti(false);
-        setBorderClass("");
-        setSubmitted(false);
-        const nextPage = currentPage + 1;
-        if (data[nextPage]) {
-          setCurrentPage(nextPage);
+
+      if (data[currentPage + 1]) {
+        setTimeout(() => {
+          setShowConfetti(false);
+          setBorderClass("");
+          setSubmitted(false);
+          setCurrentPage(currentPage + 1);
           setAnswerImages([]);
-        }
-      }, 4000);
+        }, 4000);
+      } else {
+        setTimeout(() => {
+          clearInterval(timerRef.current);
+          setShowConfetti(false);
+          setBorderClass("");
+          setGameOver(true);
+        }, 4000);
+      }
     } else {
       setBorderClass("blink-red");
-      //! console.log(JSON.stringify(answerImages).length)
       if (JSON.stringify(answerImages).length < 3) {
         const PleaseAddTheImagesAud = new Audio(PleaseAddTheImagesAudio);
         PleaseAddTheImagesAud.play();
-        setWarning(`Please add the images. .`);
+        setWarning("Please add the images.");
       } else if (!isCorrect) {
         setTries(tries + 1);
         const OopsTryAgainAud = new Audio(OopsTryAgainAudio);
@@ -231,26 +249,32 @@ const QuestionPage = () => {
       }, 2500);
       setAnswerImages([]);
     }
-    
+  };
+
+  const getTotalTimeTaken = () => {
+    const minutes = Math.floor(elapsedTime / 60000);
+    const seconds = ((elapsedTime % 60000) / 1000).toFixed(0);
+    return `${minutes} ${minutes !==1 ? "minutes" : "minute"} ${seconds < 10 ? "0" : ""}${seconds} seconds`;
   };
 
   return (
-    <DndProvider backend={isMobile ? TouchBackend : HTML5Backend}>
+    <DndProvider backend={isMobile || isTablet ? TouchBackend : HTML5Backend}>
       <div className="header mt-2">
-        <h1>Match The Pattern
-        <img
-              src={'../play.svg'}
-              alt="Play audio"
-              width="24"
-              height="24"
-              style={{ cursor: "pointer", marginLeft: "10px" }}
-              onClick={() => handleAudioClick(MatchThePatternAudio)}
-            />
+        <h1 className="mt-3 mb-3">
+          Match The Pattern
+          <img
+            src={"../play.svg"}
+            alt="Play audio"
+            width="24"
+            height="24"
+            style={{ cursor: "pointer", marginLeft: "10px" }}
+            onClick={() => handleAudioClick(MatchThePatternAudio)}
+          />
         </h1>
         <div>
-           <button
+          <button
             tabIndex="0"
-            className="btn btn-lg btn-warning mt-2 mb-2"
+            className="submitbutton mt-2 mb-2"
             data-bs-toggle="popover"
             data-bs-trigger="focus"
             data-bs-title="How to Play?"
@@ -258,7 +282,7 @@ const QuestionPage = () => {
           >
             Game Instructions
             <img
-              src={'../play.svg'}
+              src={"../play.svg"}
               alt="Play audio"
               width="24"
               height="24"
@@ -268,64 +292,102 @@ const QuestionPage = () => {
           </button>
         </div>
       </div>
-      <p>Tries : {tries}</p>
       <div className="container main mt-4">
-        <div className="mb-4">
-          <h3>Question:</h3>
-          <div className="d-flex flex-row flex-wrap justify-content-center mb-3">
-            {questionData.question.map((src, index) => (
-              <img
-                key={index}
-                src={src}
-                draggable={false}
-                className="img-thumbnail m-1 dragImg"
-                width="100"
-                height="100"
-                alt={`question-${index}`}
-              />
-            ))}
-          </div>
-        </div>
-
-        <h3>Answer Box:</h3>
-        <div className="mb-4 d-flex justify-content-center align-items-center">
-          <DroppableBox
-            answerImages={answerImages}
-            setAnswerImages={setAnswerImages}
-            maxItems={questionData.question.length}
-            borderClass={borderClass}
-          />
-        </div>
-
-        <div>
-          {!submitted && (
-            <button onClick={handleSubmit} className="submitbutton ms-2 mb-4">
-              Submit
-            </button>
-          )}
-
-          {submitted && (
-            <p
-              className={`warning ${
-                warning.includes("Correct")
-                  ? "btn btn-success"
-                  : "btn btn-danger"
-              }`}
+        {!gameStarted ? (
+          <div className="start-game">
+            <button
+              onClick={handleStartGame}
+              className="submitbutton mb-5 mt-5"
             >
-              {warning}
-            </p>
-          )}
-
-          <h3>Options:</h3>
-          <div className="d-flex flex-row flex-wrap justify-content-center">
-            {questionData.images.map((src, index) => (
-              <DraggableImage key={index} src={src} index={index} />
-            ))}
+              Start Game
+            </button>
           </div>
-        </div>
+        ) : gameOver ? (
+          <div className="game-over">
+            <h2 className="mt-2 mb-2">Game Over!</h2>
+            <h3 className="mt-3 mb-2">Time taken: {getTotalTimeTaken()}</h3>
+            <h3 className="mt-3 mb-2">Total Tries : {tries}</h3>
+            <button
+              onClick={() => {
+                setCurrentPage(1);
+                setAnswerImages([]);
+                setShowConfetti(false);
+                setTries(0);
+                setBorderClass("")
+                setWarning("");
+                setSubmitted(false);
+                setGameOver(false);
+                setGameStarted(false);
+                setElapsedTime(0);
+              }}
+              className="submitbutton mb-4 mt-3"
+            >
+              Play Again
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="mb-4">
+              <h3>Question:</h3>
+              <div className="d-flex flex-row flex-wrap justify-content-center mb-3">
+                {questionData.question.map((src, index) => (
+                  <img
+                    key={index}
+                    src={src}
+                    draggable={false}
+                    className="img-thumbnail m-1 dragImg"
+                    width="100"
+                    height="100"
+                    alt={`question-${index}`}
+                  />
+                ))}
+              </div>
+            </div>
 
-        {showConfetti && <Confetti />}
-        <br />
+            <h3>Answer Box:</h3>
+            <div className="mb-4 d-flex justify-content-center align-items-center">
+              <DroppableBox
+                answerImages={answerImages}
+                setAnswerImages={setAnswerImages}
+                maxItems={questionData.question.length}
+                borderClass={borderClass}
+              />
+            </div>
+
+            <div>
+              {!submitted && !gameOver && (
+                <button
+                  onClick={handleSubmit}
+                  className="submitbutton ms-2 mb-4"
+                >
+                  Submit
+                </button>
+              )}
+
+              {submitted && !gameOver && (
+                <p
+                  className={`warning ${
+                    warning.includes("Correct")
+                      ? "btn btn-success"
+                      : "btn btn-danger"
+                  }`}
+                >
+                  {warning}
+                </p>
+              )}
+
+              <h3>Options:</h3>
+              <div className="d-flex flex-row flex-wrap justify-content-center">
+                {questionData.images.map((src, index) => (
+                  <DraggableImage key={index} src={src} index={index} />
+                ))}
+              </div>
+            </div>
+
+            {showConfetti && <Confetti />}
+            <br />
+          </>
+        )}
       </div>
     </DndProvider>
   );

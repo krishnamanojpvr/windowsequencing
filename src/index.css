@@ -11,3 +11,9 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+@font-face {
+  font-family: 'OpenDyslexicBold'; /*a name to be used later*/
+  src: url('../public/open_dyslexic/OpenDyslexic-Bold.otf'); /*URL to font*/
+}
+
