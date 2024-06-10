@@ -52,7 +52,7 @@ h1{
     background-color: rgb(48, 218, 231);
 }
 
-.submitbutton {
+.custombutton {
     position: relative;
     font-size: 15px;
     text-transform: uppercase;
@@ -70,17 +70,17 @@ h1{
     background-color: rgb(234, 220, 200);;
    }
    
-   .submitbutton:hover {
+   .custombutton:hover {
     transform: translateY(-3px);
     box-shadow: 0 20px 20px rgba(0, 0, 0, 0.5);
    }
    
-   .submitbutton:active {
+   .custombutton:active {
     transform: translateY(-1px);
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
    }
    
-   .submitbutton::after {
+   .custombutton::after {
     content: "";
     display: inline-block;
     height: 100%;
@@ -93,11 +93,11 @@ h1{
     transition: all .4s;
    }
    
-   .submitbutton::after {
+   .custombutton::after {
     background-color: rgb(234, 220, 200);
    }
    
-   .submitbutton:hover::after {
+   .custombutton:hover::after {
     transform: scaleX(1.4) scaleY(1.6);
     opacity: 0;
    }

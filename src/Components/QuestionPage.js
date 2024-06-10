@@ -17,6 +17,7 @@ const ItemType = "IMAGE";
 const AnswerType = "ANSWER_IMAGE";
 
 const DraggableImage = ({ src, index }) => {
+  // eslint-disable-next-line
   const [{ isDragging }, drag] = useDrag({
     type: ItemType,
     item: { index, src },
@@ -257,6 +258,19 @@ const QuestionPage = () => {
     return `${minutes} ${minutes !==1 ? "minutes" : "minute"} ${seconds < 10 ? "0" : ""}${seconds} seconds`;
   };
 
+  const resetGame = () => {
+    setCurrentPage(1);
+    setAnswerImages([]);
+    setShowConfetti(false);
+    setTries(0);
+    setBorderClass("")
+    setWarning("");
+    setSubmitted(false);
+    setGameOver(false);
+    setGameStarted(false);
+    setElapsedTime(0);
+  }
+
   return (
     <DndProvider backend={isMobile || isTablet ? TouchBackend : HTML5Backend}>
       <div className="header mt-2">
@@ -274,7 +288,7 @@ const QuestionPage = () => {
         <div>
           <button
             tabIndex="0"
-            className="submitbutton mt-2 mb-2"
+            className="custombutton mt-2 mbm-2"
             data-bs-toggle="popover"
             data-bs-trigger="focus"
             data-bs-title="How to Play?"
@@ -297,7 +311,7 @@ const QuestionPage = () => {
           <div className="start-game">
             <button
               onClick={handleStartGame}
-              className="submitbutton mb-5 mt-5"
+              className="custombutton mb-5 mt-5"
             >
               Start Game
             </button>
@@ -308,19 +322,8 @@ const QuestionPage = () => {
             <h3 className="mt-3 mb-2">Time taken: {getTotalTimeTaken()}</h3>
             <h3 className="mt-3 mb-2">Total Tries : {tries}</h3>
             <button
-              onClick={() => {
-                setCurrentPage(1);
-                setAnswerImages([]);
-                setShowConfetti(false);
-                setTries(0);
-                setBorderClass("")
-                setWarning("");
-                setSubmitted(false);
-                setGameOver(false);
-                setGameStarted(false);
-                setElapsedTime(0);
-              }}
-              className="submitbutton mb-4 mt-3"
+              onClick={resetGame}
+              className="custombutton mb-4 mt-3"
             >
               Play Again
             </button>
@@ -358,7 +361,7 @@ const QuestionPage = () => {
               {!submitted && !gameOver && (
                 <button
                   onClick={handleSubmit}
-                  className="submitbutton ms-2 mb-4"
+                  className="custombutton ms-2 mb-4"
                 >
                   Submit
                 </button>
