@@ -173,6 +173,14 @@ const QuestionPage = () => {
   const [gameStarted, setGameStarted] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
   const timerRef = useRef(null);
+  const [isFlipped, setIsFlipped] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsFlipped(true);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleAudioClick = (audioFile) => {
     const audio = new Audio(audioFile);
@@ -255,7 +263,9 @@ const QuestionPage = () => {
   const getTotalTimeTaken = () => {
     const minutes = Math.floor(elapsedTime / 60000);
     const seconds = ((elapsedTime % 60000) / 1000).toFixed(0);
-    return `${minutes} ${minutes !==1 ? "minutes" : "minute"} ${seconds < 10 ? "0" : ""}${seconds} seconds`;
+    return `${minutes} ${minutes !== 1 ? "minutes" : "minute"} ${
+      seconds < 10 ? "0" : ""
+    }${seconds} seconds`;
   };
 
   const resetGame = () => {
@@ -263,13 +273,14 @@ const QuestionPage = () => {
     setAnswerImages([]);
     setShowConfetti(false);
     setTries(0);
-    setBorderClass("")
+    setBorderClass("");
     setWarning("");
     setSubmitted(false);
     setGameOver(false);
     setGameStarted(false);
     setElapsedTime(0);
-  }
+  };
+  
 
   return (
     <DndProvider backend={isMobile || isTablet ? TouchBackend : HTML5Backend}>
@@ -321,10 +332,7 @@ const QuestionPage = () => {
             <h2 className="mt-2 mb-2">Game Over!</h2>
             <h3 className="mt-3 mb-2">Time taken: {getTotalTimeTaken()}</h3>
             <h3 className="mt-3 mb-2">Total Tries : {tries}</h3>
-            <button
-              onClick={resetGame}
-              className="custombutton mb-4 mt-3"
-            >
+            <button onClick={resetGame} className="custombutton mb-4 mt-3">
               Play Again
             </button>
           </div>
@@ -334,15 +342,20 @@ const QuestionPage = () => {
               <h3>Question:</h3>
               <div className="d-flex flex-row flex-wrap justify-content-center mb-3">
                 {questionData.question.map((src, index) => (
-                  <img
-                    key={index}
-                    src={src}
-                    draggable={false}
-                    className="img-thumbnail m-1 dragImg"
-                    width="100"
-                    height="100"
-                    alt={`question-${index}`}
-                  />
+                  <div className={`flip-container ${isFlipped ? 'flipped' : ''}`}>
+                  <div className="flipper">
+                    <div className="front">
+                      <img
+                        src={src}
+                        className="img-thumbnail"
+                        alt={`option-${index}`}
+                      />
+                    </div>
+                    <div className="back">
+                      {/* Background color 'a' */}
+                    </div>
+                  </div>
+                </div>
                 ))}
               </div>
             </div>

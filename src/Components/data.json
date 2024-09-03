@@ -1,20 +1,17 @@
 {
     "1":{
-        "question":["../a1.png","../a2.png","../a3.png"],
-        "images":["../a1.png","../a2.png","../a3.png","../a4.png","../boat.png","../boatshadow.png","../jar.png"]
+        "question":["../yc.png","../bc.png","../yc.png"],
+        "images":["../yc.png","../blc.png","../bc.png","../wc.png","../ys.png","../bls.png","../bs.png","../ws.png"]
     },
     "2":{
-        "question":["../boat.png","../a4.png","../jar.png"],
-        "images":["../a1.png","../a2.png","../a3.png","../a4.png","../boat.png","../boatshadow.png","../jar.png"]
-    },
+        "question":["../bc.png","../bls.png","../bc.png"],
+        "images":["../yc.png","../blc.png","../bc.png","../wc.png","../ys.png","../bls.png","../bs.png","../ws.png"]    },
     "3":{
-        "question":["../jar.png","../a2.png","../a4.png"],
-        "images":["../a1.png","../a2.png","../a3.png","../a4.png","../boat.png","../boatshadow.png","../jar.png"]
-    },
+        "question":["../bc.png","../bs.png","../ys.png"],
+        "images":["../yc.png","../blc.png","../bc.png","../wc.png","../ys.png","../bls.png","../bs.png","../ws.png"]    },
     "4":{
-        "question":["../boat.png","../a1.png","../a3.png"],
-        "images":["../a1.png","../a2.png","../a3.png","../a4.png","../boat.png","../boatshadow.png","../jar.png"]
-    }
+        "question":["../bls.png","../ws.png","../ys.png"],
+        "images":["../yc.png","../blc.png","../bc.png","../wc.png","../ys.png","../bls.png","../bs.png","../ws.png"]    }
 }
 
 
